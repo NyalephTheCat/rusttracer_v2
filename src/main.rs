@@ -7,16 +7,16 @@ use rusttracer::{
 };
 
 fn main() {
-    let mut image = RgbImage::new(1000, 1000);
+    let mut image = RgbImage::new(500, 500);
     let scene = Scene::default()
-        .with_camera(Camera::default())
+        .with_camera(Camera::default().with_anti_aliasing(100))
         .with_background("#1CB5E0".into())
         .with_object(
             Metaball::default()
                 .with_bounds(((-10.0, -10.0, -10.0).into(), (10.0, 10.0, 10.0).into()))
                 .with_point(MetaballPoint::default().with_position((5.0, 0.0, 0.0).into()))
                 //.with_point(MetaballPoint::default().with_position((5.0, 0.0, -1.0).into()))
-                .with_resolution(0.1)
+                .with_resolution(0.4)
                 .with_fronteer(1.5)
                 .into(),
         )
