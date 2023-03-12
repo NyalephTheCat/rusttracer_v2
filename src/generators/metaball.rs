@@ -1,6 +1,8 @@
 use crate::{
     material::texture::Texture,
-    objects::{mesh::Mesh, triangle::Triangle, Object, smooth_triangle::SmoothTriangle, Intersectable},
+    objects::{
+        mesh::Mesh, smooth_triangle::SmoothTriangle, triangle::Triangle, Intersectable, Object,
+    },
     utils::math::{point::Point, vector::Vector},
 };
 
@@ -15,13 +17,6 @@ pub struct MetaballPoint {
 impl MetaballPoint {
     pub fn new(position: Point, radius: f64) -> MetaballPoint {
         MetaballPoint { position, radius }
-    }
-
-    pub fn default() -> MetaballPoint {
-        MetaballPoint {
-            position: Point::new(0.0, 0.0, 0.0),
-            radius: 1.0,
-        }
     }
 
     pub fn with_position(&self, position: Point) -> MetaballPoint {
@@ -42,7 +37,7 @@ impl MetaballPoint {
             let i = x.to_bits();
             let i = 0x5f3759df - (i >> 1);
             let y = f32::from_bits(i);
-        
+
             (y * (1.5 - 0.5 * x * y * y)) as f64
         }
         // Euclidian distance between both points
@@ -53,7 +48,10 @@ impl MetaballPoint {
 
 impl Default for MetaballPoint {
     fn default() -> Self {
-        MetaballPoint::default()
+        MetaballPoint {
+            position: Point::new(0.0, 0.0, 0.0),
+            radius: 1.0,
+        }
     }
 }
 
@@ -83,16 +81,6 @@ impl Metaball {
         }
     }
 
-    pub fn default() -> Metaball {
-        Metaball {
-            bounds: (Point::new(-10.0, -10.0, -10.0), Point::new(10.0, 10.0, 10.0)),
-            resolution: 0.1,
-            points: vec![],
-            texture: Texture::default(),
-            fronteer: 1.0,
-        }
-    }
-
     pub fn with_bounds(&self, bounds: (Point, Point)) -> Metaball {
         Metaball {
             bounds,
@@ -117,7 +105,7 @@ impl Metaball {
     pub fn with_point(&self, point: MetaballPoint) -> Metaball {
         let mut points = self.points.clone();
         points.push(point);
-        Metaball { 
+        Metaball {
             points,
             ..self.clone()
         }
@@ -160,27 +148,42 @@ impl Metaball {
     }
 
     fn cube_at(&self, point: &Point) -> Vec<Point> {
-        [ 0, 1, 3, 2, 4, 5, 7, 6 ].iter()
-            .map(|i| *point + Point::new(
-                (i & 1) as f64 * self.resolution,
-                ((i >> 1) & 1) as f64 * self.resolution,
-                ((i >> 2) & 1) as f64 * self.resolution,
-            )).collect()
+        [0, 1, 3, 2, 4, 5, 7, 6]
+            .iter()
+            .map(|i| {
+                *point
+                    + Point::new(
+                        (i & 1) as f64 * self.resolution,
+                        ((i >> 1) & 1) as f64 * self.resolution,
+                        ((i >> 2) & 1) as f64 * self.resolution,
+                    )
+            })
+            .collect()
     }
 
     fn iter_cubes(&self) -> impl Iterator<Item = Vec<Point>> + '_ {
         self.iter_points().map(move |p1| self.cube_at(&p1))
     }
 
-    fn cube_value(&self, cube: &Vec<Point>) -> usize {
-        cube.iter()
-            .fold(0, |acc, p| acc * 2 + (self.value(p) < self.fronteer) as usize)
+    fn cube_value(&self, cube: &[Point]) -> usize {
+        cube.iter().fold(0, |acc, p| {
+            acc * 2 + (self.value(p) < self.fronteer) as usize
+        })
     }
 }
 
 impl Default for Metaball {
     fn default() -> Self {
-        Metaball::default()
+        Metaball {
+            bounds: (
+                Point::new(-10.0, -10.0, -10.0),
+                Point::new(10.0, 10.0, 10.0),
+            ),
+            resolution: 0.1,
+            points: vec![],
+            texture: Texture::default(),
+            fronteer: 1.0,
+        }
     }
 }
 
@@ -216,24 +219,35 @@ impl MeshGenerator for Metaball {
 
             points
         });
-        
+
         let mesh = Mesh::default();
 
         // Compute all the normal triangles
-        let tri = (0..points.len()).step_by(3).map(|i| {
-            Triangle::default().with_a(points[i]).with_b(points[i + 1]).with_c(points[i + 2])
-        }).collect::<Vec<_>>();
+        let tri = (0..points.len())
+            .step_by(3)
+            .map(|i| {
+                Triangle::default()
+                    .with_a(points[i])
+                    .with_b(points[i + 1])
+                    .with_c(points[i + 2])
+            })
+            .collect::<Vec<_>>();
 
         let smooth_tri = tri.iter().map(|t| {
-            let normals = t.points.iter().map(|p| {
-                tri.iter()
-                    .filter(|t| t.points.iter().any(|p2| (*p - *p2).length() < 1e-6))
-                    .fold(
-                        Vector::zero(),
-                        |acc, t| acc + t.normal(p),
-                    ).normalize()
-            }).collect();
-            SmoothTriangle::default().with_points(t.points).with_normals(normals).with_texture(self.texture.clone())
+            let normals = t
+                .points
+                .iter()
+                .map(|p| {
+                    tri.iter()
+                        .filter(|t| t.points.iter().any(|p2| (*p - *p2).length() < 1e-6))
+                        .fold(Vector::zero(), |acc, t| acc + t.normal(p))
+                        .normalize()
+                })
+                .collect();
+            SmoothTriangle::default()
+                .with_points(t.points)
+                .with_normals(normals)
+                .with_texture(self.texture)
         });
 
         //mesh.with_faces(tri.iter().map(|t| t.clone().into()).collect())

@@ -1,9 +1,9 @@
-use self::{uniform::UniformTexture, checkerboard::CheckerboardTexture};
+use self::{checkerboard::CheckerboardTexture, uniform::UniformTexture};
 
 use super::Material;
 
-pub mod uniform;
 pub mod checkerboard;
+pub mod uniform;
 
 pub trait Texturable {
     fn value(self, u: f64, v: f64) -> Material;
@@ -19,15 +19,11 @@ impl Texture {
     pub fn new_uniform(material: Material) -> Texture {
         Texture::Uniform(UniformTexture::new(material))
     }
-
-    pub fn default() -> Texture {
-        Texture::Uniform(UniformTexture::default())
-    }
 }
 
 impl Default for Texture {
     fn default() -> Texture {
-        Texture::default()
+        Texture::Uniform(UniformTexture::default())
     }
 }
 

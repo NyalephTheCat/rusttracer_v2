@@ -40,7 +40,52 @@ impl Material {
         }
     }
 
-    pub fn default() -> Material {
+    pub fn with_name(&self, name: &'static str) -> Material {
+        let mut material = *self;
+        material.name = name;
+        material
+    }
+
+    pub fn with_color(&self, color: Color) -> Material {
+        let mut material = *self;
+        material.color = color;
+        material
+    }
+
+    pub fn with_ambient(&self, ambient: ColorOrFloat) -> Material {
+        let mut material = *self;
+        material.ambient = ambient;
+        material
+    }
+
+    pub fn with_reflection(&self, reflection: ColorOrFloat) -> Material {
+        let mut material = *self;
+        material.reflection = reflection;
+        material
+    }
+
+    pub fn with_diffuse(&self, diffuse: ColorOrFloat) -> Material {
+        let mut material = *self;
+        material.diffuse = diffuse;
+        material
+    }
+
+    pub fn with_specular(&self, specular: ColorOrFloat, specular_exponent: f64) -> Material {
+        let mut material = *self;
+        material.specular = specular;
+        material.specular_exponent = specular_exponent;
+        material
+    }
+    pub fn with_transparency(&self, transparency: ColorOrFloat, refraction_index: f64) -> Material {
+        let mut material = *self;
+        material.transparency = transparency;
+        material.refraction_index = refraction_index;
+        material
+    }
+}
+
+impl Default for Material {
+    fn default() -> Self {
         Material {
             name: "default",
             color: "#FFFFFF".into(),
@@ -52,54 +97,5 @@ impl Material {
             transparency: ColorOrFloat::Float(0.0),
             refraction_index: 1.5,
         }
-    }
-
-    pub fn with_name(&self, name: &'static str) -> Material {
-        let mut material = self.clone();
-        material.name = name;
-        material
-    }
-
-    pub fn with_color(&self, color: Color) -> Material {
-        let mut material = self.clone();
-        material.color = color;
-        material
-    }
-
-    pub fn with_ambient(&self, ambient: ColorOrFloat) -> Material {
-        let mut material = self.clone();
-        material.ambient = ambient;
-        material
-    }
-
-    pub fn with_reflection(&self, reflection: ColorOrFloat) -> Material {
-        let mut material = self.clone();
-        material.reflection = reflection;
-        material
-    }
-
-    pub fn with_diffuse(&self, diffuse: ColorOrFloat) -> Material {
-        let mut material = self.clone();
-        material.diffuse = diffuse;
-        material
-    }
-
-    pub fn with_specular(&self, specular: ColorOrFloat, specular_exponent: f64) -> Material {
-        let mut material = self.clone();
-        material.specular = specular;
-        material.specular_exponent = specular_exponent;
-        material
-    }
-    pub fn with_transparency(&self, transparency: ColorOrFloat, refraction_index: f64) -> Material {
-        let mut material = self.clone();
-        material.transparency = transparency;
-        material.refraction_index = refraction_index;
-        material
-    }
-}
-
-impl Default for Material {
-    fn default() -> Self {
-        Material::default()
     }
 }

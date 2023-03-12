@@ -21,13 +21,6 @@ impl Mesh {
         }
     }
 
-    pub fn default() -> Mesh {
-        Mesh {
-            faces: Vec::new(),
-            bounding_box: BoundingBox::empty(),
-        }
-    }
-
     pub fn with_faces(&self, faces: Vec<Object>) -> Mesh {
         let bounding_box = BoundingBox::from_objects(&faces);
         Mesh {
@@ -54,19 +47,13 @@ impl Mesh {
     }
 
     pub fn write_to_obj(&self, file: &mut std::fs::File) {
-        self.faces.iter().for_each(|face| {
-            match face {
-                Object::Triangle(triangle) => {
-                    triangle.write_to_obj(file)
-                },
-                Object::SmoothTriangle(smooth_triangle) => {
-                    smooth_triangle.write_to_obj(file)
-                },
-                Object::Mesh(mesh) => {
-                    mesh.write_to_obj(file);
-                }
-                _ => {}
+        self.faces.iter().for_each(|face| match face {
+            Object::Triangle(triangle) => triangle.write_to_obj(file),
+            Object::SmoothTriangle(smooth_triangle) => smooth_triangle.write_to_obj(file),
+            Object::Mesh(mesh) => {
+                mesh.write_to_obj(file);
             }
+            _ => {}
         });
     }
 }
@@ -105,7 +92,10 @@ impl Intersectable for Mesh {
 
 impl Default for Mesh {
     fn default() -> Mesh {
-        Mesh::default()
+        Mesh {
+            faces: Vec::new(),
+            bounding_box: BoundingBox::empty(),
+        }
     }
 }
 

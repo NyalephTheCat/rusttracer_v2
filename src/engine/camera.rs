@@ -14,6 +14,7 @@ pub struct Camera {
     pub height_fov: f64,
     pub z_min: f64,
     pub max_bounces: u32,
+    pub anti_aliasing: u32,
 }
 
 impl Camera {
@@ -25,6 +26,7 @@ impl Camera {
         beta: f64,
         z_min: f64,
         max_bounces: u32,
+        anti_aliasing: u32,
     ) -> Camera {
         let right = direction.cross(&up);
         let height_fov = (beta.to_radians() / 2.0).tan();
@@ -38,62 +40,70 @@ impl Camera {
             height_fov,
             z_min,
             max_bounces,
+            anti_aliasing,
         }
     }
 
-    pub fn default() -> Camera {
-        let height_fov = (60.0_f64.to_radians() / 2.0).tan();
-        let width_fov = (60.0_f64.to_radians() / 2.0).tan();
+    pub fn with_position(&self, position: Point) -> Self {
+        Self {
+            position,
+            ..self.clone()
+        }
+    }
 
-        Camera {
-            position: Point::new(0.0, 0.0, 0.0),
-            direction: Vector::new(1.0, 0.0, 0.0),
-            up: Vector::new(0.0, 1.0, 0.0),
-            right: Vector::new(0.0, 0.0, 1.0),
+    pub fn with_direction(&self, direction: Vector) -> Self {
+        let right = direction.cross(&self.up);
+        Self {
+            direction,
+            right,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_up(&self, up: Vector) -> Self {
+        let right = self.direction.cross(&up);
+        Self {
+            up,
+            right,
+            ..self.clone()
+        }
+    }
+
+    pub fn with_alpha(&self, alpha: f64) -> Self {
+        let width_fov = (alpha.to_radians() / 2.0).tan();
+        Self {
             width_fov,
-            height_fov,
-            z_min: 1.0,
-            max_bounces: 5,
+            ..self.clone()
         }
     }
 
-    pub fn with_position(&self, position: Point) -> Camera {
-        let mut camera = self.clone();
-        camera.position = position;
-        camera
+    pub fn with_beta(&self, beta: f64) -> Self {
+        let height_fov = (beta.to_radians() / 2.0).tan();
+        Self {
+            height_fov,
+            ..self.clone()
+        }
     }
 
-    pub fn with_direction(&self, direction: Vector) -> Camera {
-        let mut camera = self.clone();
-        camera.direction = direction.normalize();
-        camera.right = camera.direction.cross(&camera.up).normalize();
-        camera
+    pub fn with_z_min(&self, z_min: f64) -> Self {
+        Self {
+            z_min,
+            ..self.clone()
+        }
     }
 
-    pub fn with_up(&self, up: Vector) -> Camera {
-        let mut camera = self.clone();
-        camera.up = up.normalize();
-        camera.right = camera.direction.cross(&camera.up).normalize();
-        camera
+    pub fn with_max_bounces(&self, max_bounces: u32) -> Self {
+        Self {
+            max_bounces,
+            ..self.clone()
+        }
     }
 
-    pub fn with_fov(&self, alpha: f64, beta: f64) -> Camera {
-        let mut camera = self.clone();
-        camera.width_fov = (alpha.to_radians() / 2.0).tan();
-        camera.height_fov = (beta.to_radians() / 2.0).tan();
-        camera
-    }
-
-    pub fn with_z_min(&self, z_min: f64) -> Camera {
-        let mut camera = self.clone();
-        camera.z_min = z_min;
-        camera
-    }
-
-    pub fn with_max_bounces(&self, max_bounces: u32) -> Camera {
-        let mut camera = self.clone();
-        camera.max_bounces = max_bounces;
-        camera
+    pub fn with_anti_aliasing(&self, anti_aliasing: u32) -> Self {
+        Self {
+            anti_aliasing,
+            ..self.clone()
+        }
     }
 
     fn ray_inner(&self, coord: (f64, f64), offset: (f64, f64), image_size: (usize, usize)) -> Ray {
@@ -120,10 +130,10 @@ impl Camera {
         coord: (f64, f64),
         image_size: (usize, usize),
         aa_samples: usize,
+        rng: &mut impl Rng,
     ) -> Vec<Ray> {
         (0..aa_samples)
             .map(|_| {
-                let mut rng = rand::thread_rng();
                 let x_offset = rng.gen_range(0.0..1.0);
                 let y_offset = rng.gen_range(0.0..1.0);
                 self.ray_inner(coord, (x_offset, y_offset), image_size)
@@ -150,5 +160,24 @@ impl Camera {
             .into_par_iter()
             .flat_map(move |y| (0..width).into_par_iter().map(move |x| (x, y)))
             .map(move |(x, y)| (x, y, self.ray((x as f64, y as f64), image_size)))
+    }
+}
+
+impl Default for Camera {
+    fn default() -> Self {
+        let height_fov = (60.0_f64.to_radians() / 2.0).tan();
+        let width_fov = (60.0_f64.to_radians() / 2.0).tan();
+
+        Camera {
+            position: Point::new(0.0, 0.0, 0.0),
+            direction: Vector::new(1.0, 0.0, 0.0),
+            up: Vector::new(0.0, 1.0, 0.0),
+            right: Vector::new(0.0, 0.0, 1.0),
+            width_fov,
+            height_fov,
+            z_min: 1.0,
+            max_bounces: 5,
+            anti_aliasing: 1,
+        }
     }
 }

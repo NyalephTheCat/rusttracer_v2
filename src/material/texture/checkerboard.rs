@@ -18,26 +18,12 @@ impl CheckerboardTexture {
         }
     }
 
-    pub fn default() -> CheckerboardTexture {
-        CheckerboardTexture {
-            material1: Material::default(),
-            material2: Material::default(),
-            scale: 1.0,
-        }
-    }
-
     pub fn with_material1(self, material1: Material) -> CheckerboardTexture {
-        CheckerboardTexture {
-            material1,
-            ..self
-        }
+        CheckerboardTexture { material1, ..self }
     }
 
     pub fn with_material2(self, material2: Material) -> CheckerboardTexture {
-        CheckerboardTexture {
-            material2,
-            ..self
-        }
+        CheckerboardTexture { material2, ..self }
     }
 
     pub fn with_scale(self, scale: f64) -> CheckerboardTexture {
@@ -66,7 +52,11 @@ impl Texturable for CheckerboardTexture {
 
 impl Default for CheckerboardTexture {
     fn default() -> CheckerboardTexture {
-        CheckerboardTexture::default()
+        CheckerboardTexture {
+            material1: Material::default(),
+            material2: Material::default(),
+            scale: 1.0,
+        }
     }
 }
 

@@ -19,13 +19,15 @@ fn main() {
                 .with_resolution(0.1)
                 .with_fronteer(1.5)
                 .into(),
-        ).with_light(
+        )
+        .with_light(
             PointLight::default()
                 .with_position((5.0, 10.0, 10.0).into())
                 .with_color("#00FF00".into())
                 .with_intensity(10.0)
                 .into(),
-        ).with_light(
+        )
+        .with_light(
             PointLight::default()
                 .with_position((5.0, 10.0, -10.0).into())
                 .with_color("#FF0000".into())
@@ -37,7 +39,7 @@ fn main() {
         Object::Mesh(mesh) => {
             let mut file = std::fs::File::create("mesh.obj").unwrap();
             mesh.write_to_obj(&mut file);
-        },
+        }
         Object::Sphere(_) => todo!(),
         Object::Plane(_) => todo!(),
         Object::Triangle(_) => todo!(),

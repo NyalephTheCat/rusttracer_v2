@@ -21,14 +21,6 @@ impl DirectionalLight {
         }
     }
 
-    pub fn default() -> DirectionalLight {
-        DirectionalLight {
-            direction: Vector::new(0.0, 0.0, -1.0),
-            color: Color::from((1.0, 1.0, 1.0)),
-            intensity: 1.0,
-        }
-    }
-
     pub fn with_direction(&self, direction: Vector) -> DirectionalLight {
         let mut light = self.clone();
         light.direction = direction;
@@ -70,6 +62,10 @@ impl From<DirectionalLight> for Light {
 
 impl Default for DirectionalLight {
     fn default() -> DirectionalLight {
-        DirectionalLight::default()
+        DirectionalLight {
+            direction: Vector::new(0.0, 0.0, -1.0),
+            color: Color::from((1.0, 1.0, 1.0)),
+            intensity: 1.0,
+        }
     }
 }

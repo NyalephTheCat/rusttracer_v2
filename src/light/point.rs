@@ -20,15 +20,6 @@ impl PointLight {
             intensity,
         }
     }
-
-    pub fn default() -> PointLight {
-        PointLight {
-            position: Point::new(0.0, 0.0, 0.0),
-            color: "#FFFFFF".into(),
-            intensity: 10.0,
-        }
-    }
-
     pub fn with_position(&self, position: Point) -> PointLight {
         let mut light = self.clone();
         light.position = position;
@@ -45,6 +36,16 @@ impl PointLight {
         let mut light = self.clone();
         light.intensity = intensity;
         light
+    }
+}
+
+impl Default for PointLight {
+    fn default() -> Self {
+        PointLight {
+            position: Point::new(0.0, 0.0, 0.0),
+            color: "#FFFFFF".into(),
+            intensity: 10.0,
+        }
     }
 }
 
@@ -67,11 +68,5 @@ impl Emittable for PointLight {
 impl From<PointLight> for Light {
     fn from(point_light: PointLight) -> Light {
         Light::Point(point_light)
-    }
-}
-
-impl Default for PointLight {
-    fn default() -> PointLight {
-        PointLight::default()
     }
 }

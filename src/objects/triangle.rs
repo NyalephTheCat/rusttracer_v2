@@ -1,3 +1,4 @@
+use super::{Intersectable, Object};
 use crate::{
     engine::{bounding_box::BoundingBox, intersection::Intersection, ray::Ray},
     material::{
@@ -7,7 +8,6 @@ use crate::{
     utils::math::{point::Point, vector::Vector},
 };
 use std::io::Write;
-use super::{Intersectable, Object};
 
 #[derive(Debug, Clone)]
 pub struct Triangle {
@@ -20,17 +20,6 @@ impl Triangle {
         Triangle { points, texture }
     }
 
-    pub fn default() -> Triangle {
-        Triangle {
-            points: [
-                Point::new(0.0, 0.0, 0.0),
-                Point::new(0.0, 0.0, 0.0),
-                Point::new(0.0, 0.0, 0.0),
-            ],
-            texture: Texture::default(),
-        }
-    }
-
     pub fn with_points(&self, points: [Point; 3]) -> Triangle {
         Triangle {
             points,
@@ -39,7 +28,7 @@ impl Triangle {
     }
 
     pub fn with_a(&self, a: Point) -> Triangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[0] = a;
         Triangle {
             points,
@@ -48,7 +37,7 @@ impl Triangle {
     }
 
     pub fn with_b(&self, b: Point) -> Triangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[1] = b;
         Triangle {
             points,
@@ -57,7 +46,7 @@ impl Triangle {
     }
 
     pub fn with_c(&self, c: Point) -> Triangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[2] = c;
         Triangle {
             points,
@@ -92,7 +81,7 @@ impl Intersectable for Triangle {
         let f = 1.0 / a;
         let s = ray.origin - self.points[0];
         let u = f * s.dot(&p);
-        if u < 0.0 || u > 1.0 {
+        if !(0.0..=1.0).contains(&u) {
             return None;
         }
         let q = s.cross(&e1);
@@ -143,12 +132,19 @@ impl Intersectable for Triangle {
 
 impl Default for Triangle {
     fn default() -> Triangle {
-        Triangle::default()
+        Triangle {
+            points: [
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(0.0, 0.0, 0.0),
+            ],
+            texture: Texture::default(),
+        }
     }
 }
 
 impl From<Triangle> for Object {
     fn from(triangle: Triangle) -> Object {
-        Object::Triangle(triangle.clone())
+        Object::Triangle(triangle)
     }
 }

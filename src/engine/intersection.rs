@@ -17,12 +17,8 @@ pub struct Intersection {
 
 impl Intersection {
     pub fn new(distance: f64, ray: &Ray, obj: Object) -> Intersection {
-        let material = obj
-            .clone()
-            .material_at(&(*&ray.origin + ray.direction * distance));
-        let normal = obj
-            .clone()
-            .normal(&(*&ray.origin + ray.direction * distance));
+        let material = obj.material_at(&(ray.origin + ray.direction * distance));
+        let normal = obj.normal(&(ray.origin + ray.direction * distance));
 
         Intersection {
             distance,

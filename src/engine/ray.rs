@@ -1,4 +1,4 @@
-use crate::light::{Emittable, self};
+use crate::light::Emittable;
 use crate::utils::{
     color::Color,
     math::{point::Point, vector::Vector},
@@ -22,14 +22,6 @@ impl Ray {
         }
     }
 
-    pub fn default() -> Ray {
-        Ray {
-            origin: Point::new(0.0, 0.0, 0.0),
-            direction: Vector::new(1.0, 0.0, 0.0),
-            depth: 0,
-        }
-    }
-
     pub fn point_at(&self, distance: f64) -> Point {
         self.origin + self.direction * distance
     }
@@ -44,19 +36,18 @@ impl Ray {
         scene
             .trace(self.clone())
             .map(|intersection| {
-                let reflected =
-                                if Into::<f64>::into(intersection.material.reflection) == 0.0 {
-                                    Color::zero()
-                                } else {
-                                    Ray::new(
-                                        intersection.point + intersection.normal * 1e-4,
-                                        self.direction.reflect(&intersection.normal),
-                                        self.depth + 1,
-                                    )
-                                    .cast(scene.clone())
-                                        * intersection.material.reflection
-                                }
-                                .clamp();
+                let reflected = if Into::<f64>::into(intersection.material.reflection) == 0.0 {
+                    Color::zero()
+                } else {
+                    Ray::new(
+                        intersection.point + intersection.normal * 1e-4,
+                        self.direction.reflect(&intersection.normal),
+                        self.depth + 1,
+                    )
+                    .cast(scene.clone())
+                        * intersection.material.reflection
+                }
+                .clamp();
 
                 let light_color: Color = scene
                     .lights
@@ -92,10 +83,20 @@ impl Ray {
 
                             color.clamp()
                         },
-                    ).into();
+                    );
 
-                    light_color + reflected
+                light_color + reflected
             })
             .unwrap_or(scene.background)
+    }
+}
+
+impl Default for Ray {
+    fn default() -> Self {
+        Ray {
+            origin: Point::new(0.0, 0.0, 0.0),
+            direction: Vector::new(1.0, 0.0, 0.0),
+            depth: 0,
+        }
     }
 }

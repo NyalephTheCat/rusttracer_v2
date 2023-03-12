@@ -1,10 +1,10 @@
+use super::{Intersectable, Object};
 use crate::{
     engine::{bounding_box::BoundingBox, intersection::Intersection, ray::Ray},
     material::texture::{Texturable, Texture},
     utils::math::{point::Point, vector::Vector},
 };
 use std::io::Write;
-use super::{Intersectable, Object};
 
 #[derive(Debug, Clone)]
 pub struct SmoothTriangle {
@@ -19,22 +19,6 @@ impl SmoothTriangle {
             points,
             normals: normals.to_vec(),
             texture,
-        }
-    }
-
-    pub fn default() -> SmoothTriangle {
-        SmoothTriangle {
-            points: [
-                Point::new(0.0, 0.0, 0.0),
-                Point::new(0.0, 0.0, 0.0),
-                Point::new(0.0, 0.0, 0.0),
-            ],
-            normals: vec![
-                Vector::new(0.0, 0.0, 0.0),
-                Vector::new(0.0, 0.0, 0.0),
-                Vector::new(0.0, 0.0, 0.0),
-            ],
-            texture: Texture::default(),
         }
     }
 
@@ -60,7 +44,7 @@ impl SmoothTriangle {
     }
 
     pub fn with_a(&self, a: Point, a_n: Vector) -> SmoothTriangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[0] = a;
         let mut normals = self.normals.clone();
         normals[0] = a_n;
@@ -72,7 +56,7 @@ impl SmoothTriangle {
     }
 
     pub fn with_b(&self, b: Point, b_n: Vector) -> SmoothTriangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[1] = b;
         let mut normals = self.normals.clone();
         normals[1] = b_n;
@@ -84,7 +68,7 @@ impl SmoothTriangle {
     }
 
     pub fn with_c(&self, c: Point, c_n: Vector) -> SmoothTriangle {
-        let mut points = self.points.clone();
+        let mut points = self.points;
         points[2] = c;
         let mut normals = self.normals.clone();
         normals[2] = c_n;
@@ -120,7 +104,7 @@ impl Intersectable for SmoothTriangle {
         let inv_det = 1.0 / det;
         let t = ray.origin - self.points[0];
         let u = t.dot(&p) * inv_det;
-        if u < 0.0 || u > 1.0 {
+        if !(0.0..=1.0).contains(&u) {
             return None;
         }
 
@@ -191,12 +175,24 @@ impl Intersectable for SmoothTriangle {
 
 impl Default for SmoothTriangle {
     fn default() -> SmoothTriangle {
-        SmoothTriangle::default()
+        SmoothTriangle {
+            points: [
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(0.0, 0.0, 0.0),
+                Point::new(0.0, 0.0, 0.0),
+            ],
+            normals: vec![
+                Vector::new(0.0, 0.0, 0.0),
+                Vector::new(0.0, 0.0, 0.0),
+                Vector::new(0.0, 0.0, 0.0),
+            ],
+            texture: Texture::default(),
+        }
     }
 }
 
 impl From<SmoothTriangle> for Object {
     fn from(triangle: SmoothTriangle) -> Object {
-        Object::SmoothTriangle(triangle.clone())
+        Object::SmoothTriangle(triangle)
     }
 }

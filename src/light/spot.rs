@@ -34,17 +34,6 @@ impl SpotLight {
         }
     }
 
-    pub fn default() -> SpotLight {
-        SpotLight {
-            position: Point::new(0.0, 0.0, 0.0),
-            direction: Vector::new(0.0, 0.0, -1.0),
-            color: Color::from((1.0, 1.0, 1.0)),
-            intensity: 1.0,
-            cutoff: 0.0,
-            falloff: 0.0,
-        }
-    }
-
     pub fn with_position(&self, position: Point) -> SpotLight {
         let mut light = self.clone();
         light.position = position;
@@ -110,6 +99,13 @@ impl From<SpotLight> for Light {
 
 impl Default for SpotLight {
     fn default() -> SpotLight {
-        SpotLight::default()
+        SpotLight {
+            position: Point::new(0.0, 0.0, 0.0),
+            direction: Vector::new(0.0, 0.0, -1.0),
+            color: Color::from((1.0, 1.0, 1.0)),
+            intensity: 1.0,
+            cutoff: 0.0,
+            falloff: 0.0,
+        }
     }
 }

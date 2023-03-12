@@ -25,15 +25,6 @@ impl Plane {
             scale,
         }
     }
-
-    pub fn default() -> Plane {
-        Plane {
-            position: Point::new(0.0, 0.0, 0.0),
-            normal: Vector::new(0.0, 1.0, 0.0),
-            texture: Texture::default(),
-            scale: 1.0,
-        }
-    }
 }
 
 impl Intersectable for Plane {
@@ -71,7 +62,12 @@ impl Intersectable for Plane {
 
 impl Default for Plane {
     fn default() -> Plane {
-        Plane::default()
+        Plane {
+            position: Point::new(0.0, 0.0, 0.0),
+            normal: Vector::new(0.0, 1.0, 0.0),
+            texture: Texture::default(),
+            scale: 1.0,
+        }
     }
 }
 

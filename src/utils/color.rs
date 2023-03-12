@@ -60,11 +60,31 @@ impl Color {
         let b = u8::from_str_radix(&hex[4..6], 16).unwrap();
         Color::from((r, g, b))
     }
+
+    pub fn relative_luminance(&self) -> f64 {
+        0.2126 * self.r + 0.7152 * self.g + 0.0722 * self.b
+    }
+
+    pub fn contrast(&self, color: Color) -> f64 {
+        let l1 = self.relative_luminance();
+        let l2 = color.relative_luminance();
+        if l1 > l2 {
+            (l1 + 0.05) / (l2 + 0.05)
+        } else {
+            (l2 + 0.05) / (l1 + 0.05)
+        }
+    }
 }
 
 impl From<&str> for Color {
     fn from(hex: &str) -> Color {
         Color::from_hex(hex)
+    }
+}
+
+impl From<Rgb<u8>> for Color {
+    fn from(rgb: Rgb<u8>) -> Color {
+        Color::from((rgb[0], rgb[1], rgb[2]))
     }
 }
 

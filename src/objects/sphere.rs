@@ -25,14 +25,6 @@ impl Sphere {
         }
     }
 
-    pub fn default() -> Sphere {
-        Sphere {
-            center: Point::new(0.0, 0.0, 0.0),
-            radius: 1.0,
-            texture: Texture::default(),
-        }
-    }
-
     pub fn with_texture(&self, texture: Texture) -> Sphere {
         let mut sphere = self.clone();
         sphere.texture = texture;
@@ -114,7 +106,11 @@ impl Intersectable for Sphere {
 
 impl Default for Sphere {
     fn default() -> Sphere {
-        Sphere::default()
+        Sphere {
+            center: Point::new(0.0, 0.0, 0.0),
+            radius: 1.0,
+            texture: Texture::default(),
+        }
     }
 }
 
