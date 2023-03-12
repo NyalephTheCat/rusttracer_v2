@@ -1,0 +1,19 @@
+[package]
+name = "rusttracer_v2"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "rusttracer"
+path = "src/lib.rs"
+doc = true
+
+[[bin]]
+name = "rusttracer"
+path = "src/main.rs"
+
+[dependencies]
+image = "0.24.5"
+indicatif = {version = "*", features = ["rayon"]}
+rand = "0.8.5"
+rayon = "1.7.0"
